@@ -1,31 +1,14 @@
+// chat-app\src\models\Group.js
 import mongoose from 'mongoose';
 
 const GroupSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    required: true 
-  },
-  ownerId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
-  admins: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User' 
-  }],
-  members: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User' 
-  }],
-  avatar: { 
-    type: String, 
-    default: '/default-group.png' 
-  },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  }
-});
+  name:        { type: String, required: true, trim: true },
+  photo:       { type: String, default: null },
+  members:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  admins:      [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  createdBy:   { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  onlyAdmins:  { type: Boolean, default: false },
+  lastMessage: { type: mongoose.Schema.Types.Mixed, default: null },
+}, { timestamps: true });
 
 export default mongoose.models.Group || mongoose.model('Group', GroupSchema);

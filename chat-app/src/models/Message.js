@@ -1,28 +1,39 @@
 import mongoose from 'mongoose';
 
 const MessageSchema = new mongoose.Schema({
-  chatId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Chat', 
-    required: true 
+  chatId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chat',
+    required: [true, 'chatId is required']
   },
-  senderId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'senderId is required']
   },
-  content: { 
-    type: String, 
-    required: true 
+  content: {
+    type: String,
+    required: [true, 'content is required'],
+    trim: true
   },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+  fileUrl: {
+    type: String,
+    default: null
   },
-  read: { 
-    type: Boolean, 
-    default: false 
-  }
+  fileType: {
+    type: String,
+    default: null
+  },
+  fileName: {
+    type: String,
+    default: null
+  },
+  readBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
+}, {
+  timestamps: true
 });
 
 export default mongoose.models.Message || mongoose.model('Message', MessageSchema);

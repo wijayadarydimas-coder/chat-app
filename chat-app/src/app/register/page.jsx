@@ -1,4 +1,5 @@
 'use client';
+// chat-app\src\app\register\page.jsx
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,61 +7,28 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    // Validasi password
-    if (formData.password !== formData.confirmPassword) {
-      setError('Password tidak cocok');
-      return;
-    }
-    
-    if (formData.password.length < 6) {
-      setError('Password minimal 6 karakter');
-      return;
-    }
-    
+    if (formData.password !== formData.confirmPassword) { setError('Password tidak cocok'); return; }
+    if (formData.password.length < 6) { setError('Password minimal 6 karakter'); return; }
     setLoading(true);
-    
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: formData.username, email: formData.email, password: formData.password })
       });
-      
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Registrasi gagal');
-      }
-      
-      // Registrasi berhasil, redirect ke login
+      if (!res.ok) throw new Error(data.error || 'Registrasi gagal');
       router.push('/login?registered=true');
-      
     } catch (err) {
       setError(err.message);
     } finally {
@@ -68,102 +36,84 @@ export default function RegisterPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          Daftar Akun Baru
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Atau{' '}
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            login jika sudah punya akun
-          </Link>
-        </p>
-      </div>
+  const inputStyle = (name) => ({
+    width: '100%', padding: '11px 14px',
+    background: 'var(--bg-elevated)',
+    border: `1px solid ${focused === name ? 'var(--border-accent)' : 'var(--border)'}`,
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text-primary)', fontSize: 14, outline: 'none',
+    transition: 'border-color 0.2s', boxSizing: 'border-box', fontFamily: 'inherit',
+  });
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+  const fields = [
+    { name: 'username', label: 'Username', type: 'text', placeholder: 'username kamu' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'kamu@email.com' },
+    { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
+    { name: 'confirmPassword', label: 'Konfirmasi Password', type: 'password', placeholder: '••••••••' },
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .auth-card { animation: fadeUp 0.3s ease; }
+        ::placeholder { color: var(--text-muted); }
+      `}</style>
+
+      <div className="auth-card" style={{ width: '100%', maxWidth: 420 }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', marginBottom: 16, boxShadow: 'var(--shadow-glow)' }}>
+            <span style={{ fontSize: 24 }}>💬</span>
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 8 }}>ChatApp</div>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Buat Akun Baru</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
+            Sudah punya akun?{' '}
+            <Link href="/login" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>Login</Link>
+          </p>
+        </div>
+
+        {/* Card */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '32px 28px', boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }}>
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div style={{ background: 'var(--danger-muted)', border: '1px solid var(--danger)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 20, fontSize: 13, color: 'var(--danger)' }}>
               {error}
             </div>
           )}
-          
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <div className="mt-1">
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {fields.map(f => (
+              <div key={f.name}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>{f.label}</label>
                 <input
-                  name="username"
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  name={f.name} type={f.type} required
+                  value={formData[f.name]} onChange={handleChange}
+                  style={inputStyle(f.name)}
+                  onFocus={() => setFocused(f.name)}
+                  onBlur={() => setFocused('')}
+                  placeholder={f.placeholder}
                 />
               </div>
-            </div>
+            ))}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <div className="mt-1">
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Konfirmasi Password
-              </label>
-              <div className="mt-1">
-                <input
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {loading ? 'Memproses...' : 'Daftar'}
-              </button>
-            </div>
+            <button
+              type="submit" disabled={loading}
+              style={{
+                width: '100%', padding: '12px', marginTop: 4,
+                background: loading ? 'var(--accent-muted)' : 'var(--accent)',
+                border: 'none', borderRadius: 'var(--radius-sm)',
+                color: loading ? 'var(--accent)' : '#0a0c10',
+                fontWeight: 700, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: loading ? 'none' : 'var(--shadow-glow)',
+              }}
+            >
+              {loading && <div style={{ width: 16, height: 16, border: '2px solid var(--accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />}
+              {loading ? 'Memproses...' : 'Daftar Sekarang'}
+            </button>
           </form>
         </div>
       </div>

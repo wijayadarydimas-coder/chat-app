@@ -5,38 +5,39 @@ export function middleware(request) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get('token')?.value;
   
-  // Halaman public (tanpa login)
+  // ⚠️ IMPORTANT: API routes should NOT be redirected to pages
+  const isApiRoute = path.startsWith('/api/');
   const isPublicPath = path === '/login' || 
                        path === '/register' || 
                        path === '/lobby' ||
                        path === '/';
   
-  // Guest hanya bisa akses lobby
+  console.log('=================================');
+  console.log('Path:', path);
+  console.log('Is API Route:', isApiRoute);
+  console.log('Token:', token ? 'Ada' : 'Tidak ada');
+  
+  // ✅ JANGAN redirect API routes! Biarkan mereka return JSON
+  if (isApiRoute) {
+    console.log('✅ API Route - lanjutkan');
+    return NextResponse.next();
+  }
+  
+  // Guest hanya bisa akses public paths
   if (!token && !isPublicPath) {
+    console.log('❌ Redirect ke lobby');
     return NextResponse.redirect(new URL('/lobby', request.url));
   }
   
   // User yang sudah login tidak bisa akses halaman login/register
   if (token && (path === '/login' || path === '/register')) {
+    console.log('✅ Redirect ke chat');
     return NextResponse.redirect(new URL('/chat', request.url));
-  }
-  
-  // Verifikasi token
-  if (token) {
-    try {
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      // Token tidak valid
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      response.cookies.delete('token');
-      return response;
-    }
   }
   
   return NextResponse.next();
 }
 
-// Konfigurasi path yang di-protect
 export const config = {
   matcher: [
     '/',
@@ -46,8 +47,6 @@ export const config = {
     '/chat/:path*',
     '/group/:path*',
     '/call/:path*',
-    '/api/chat/:path*',
-    '/api/group/:path*',
-    '/api/call/:path*'
+    '/api/:path*'  // API routes tetap di-match tapi tidak di-redirect
   ]
 };

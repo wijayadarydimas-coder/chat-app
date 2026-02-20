@@ -1,100 +1,108 @@
-// src/app/lobby/page.jsx - COPY PASTE
 'use client';
+// chat-app\src\app\lobby\page.jsx
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+const features = [
+  { icon: '💬', title: 'Private Chat', desc: 'Chat pribadi realtime dengan enkripsi end-to-end' },
+  { icon: '👥', title: 'Group Chat', desc: 'Buat grup diskusi dengan banyak anggota sekaligus' },
+  { icon: '📞', title: 'Voice Call', desc: 'Panggilan suara jernih dan berkualitas tinggi' },
+];
+
 export default function LobbyPage() {
   const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  
+  useEffect(() => setMounted(true), []);
   if (!mounted) return null;
-  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
-      {/* Navbar */}
-      <nav className="bg-white/10 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="text-white font-bold text-xl">
-              ChatApp
-            </div>
-            <div className="space-x-4">
-              <Link 
-                href="/login"
-                className="text-white hover:text-gray-200 px-3 py-2 rounded-md"
-              >
-                Login
-              </Link>
-              <Link 
-                href="/register"
-                className="bg-white text-blue-600 px-4 py-2 rounded-md font-medium hover:bg-gray-100"
-              >
-                Register
-              </Link>
-            </div>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', fontFamily: "'DM Sans', sans-serif" }}>
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        .hero-title { animation: fadeUp 0.5s ease 0.1s both; }
+        .hero-sub   { animation: fadeUp 0.5s ease 0.2s both; }
+        .hero-cta   { animation: fadeUp 0.5s ease 0.3s both; }
+        .feat-cards { animation: fadeUp 0.5s ease 0.4s both; }
+        .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,229,195,0.3); }
+        .btn-ghost:hover   { background: var(--bg-elevated) !important; }
+        .feat-card:hover   { border-color: var(--border-accent) !important; transform: translateY(-3px); }
+        .nav-link:hover    { color: var(--text-primary) !important; }
+      `}</style>
+
+      {/* Ambient glow */}
+      <div style={{ position: 'fixed', top: -200, left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, background: 'radial-gradient(ellipse, rgba(0,229,195,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0, animation: 'pulse 6s ease infinite' }} />
+
+      {/* ── NAVBAR ── */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(10,12,16,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>💬</div>
+            <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>ChatApp</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link href="/login" className="nav-link" style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, padding: '7px 14px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', transition: 'color 0.15s' }}>
+              Login
+            </Link>
+            <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 14, fontWeight: 700, padding: '8px 18px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block' }}>
+              Daftar Gratis
+            </Link>
           </div>
         </div>
       </nav>
-      
-      {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Chat dengan Teman
-            <br />
-            <span className="text-yellow-300">Gratis & Mudah</span>
-          </h1>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Aplikasi chat berbasis web dengan fitur lengkap. 
-            Private chat, group chat, dan voice call.
-          </p>
-          <div className="space-x-4">
-            <Link 
-              href="/register"
-              className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-bold text-lg hover:bg-yellow-300 inline-block"
-            >
-              Mulai Sekarang
-            </Link>
-            <Link 
-              href="/login"
-              className="bg-white/20 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-white/30 inline-block"
-            >
-              Login
-            </Link>
-          </div>
+
+      {/* ── HERO ── */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '96px 24px 80px', textAlign: 'center' }}>
+        {/* Badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', borderRadius: 100, padding: '5px 14px', marginBottom: 28, fontSize: 12, fontWeight: 600, color: 'var(--accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', boxShadow: '0 0 6px var(--accent)' }} />
+          Realtime • Gratis • Aman
         </div>
-        
-        {/* Fitur Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white">
-            <div className="text-4xl mb-4">💬</div>
-            <h3 className="text-xl font-bold mb-2">Private Chat</h3>
-            <p className="text-white/80">
-              Chat pribadi dengan teman, realtime dan aman
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white">
-            <div className="text-4xl mb-4">👥</div>
-            <h3 className="text-xl font-bold mb-2">Group Chat</h3>
-            <p className="text-white/80">
-              Buat grup diskusi dengan banyak anggota
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white">
-            <div className="text-4xl mb-4">📞</div>
-            <h3 className="text-xl font-bold mb-2">Voice Call</h3>
-            <p className="text-white/80">
-              Panggilan suara berkualitas tinggi
-            </p>
-          </div>
+
+        <h1 className="hero-title" style={{ fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
+          Chat dengan Teman,<br />
+          <span style={{ color: 'var(--accent)' }}>Kapan & Di Mana Saja</span>
+        </h1>
+
+        <p className="hero-sub" style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 520, margin: '0 auto 40px', lineHeight: 1.7 }}>
+          Aplikasi chat modern dengan fitur lengkap — private chat, group chat, dan voice call. Gratis selamanya.
+        </p>
+
+        <div className="hero-cta" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 15, fontWeight: 700, padding: '13px 28px', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block', boxShadow: 'var(--shadow-glow)' }}>
+            Mulai Sekarang →
+          </Link>
+          <Link href="/login" className="btn-ghost" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)', fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 'var(--radius-md)', textDecoration: 'none', border: '1px solid var(--border)', transition: 'all 0.2s', display: 'inline-block' }}>
+            Login
+          </Link>
         </div>
-      </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section className="feat-cards" style={{ position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '0 24px 96px' }}>
+        {/* Section label */}
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 10 }}>Fitur Unggulan</div>
+          <div style={{ width: 40, height: 2, background: 'var(--accent)', margin: '0 auto', borderRadius: 2 }} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          {features.map((f, i) => (
+            <div key={i} className="feat-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '28px 24px', transition: 'all 0.2s ease', cursor: 'default' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 'var(--radius-md)', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 18 }}>
+                {f.icon}
+              </div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{ borderTop: '1px solid var(--border)', padding: '24px', textAlign: 'center' }}>
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>© {new Date().getFullYear()} ChatApp — dibuat dengan 💚</span>
+      </footer>
     </div>
   );
 }
