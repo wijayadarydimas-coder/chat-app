@@ -93,7 +93,7 @@ export default function LoginPage() {
                 style={inputStyle('email')}
                 onFocus={() => setFocused('email')}
                 onBlur={() => setFocused('')}
-                placeholder="kamu@email.com"
+                placeholder="bangder@email.com"
               />
             </div>
 

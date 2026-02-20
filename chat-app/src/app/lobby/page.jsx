@@ -5,9 +5,36 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const features = [
-  { icon: '💬', title: 'Private Chat', desc: 'Chat pribadi realtime dengan enkripsi end-to-end' },
-  { icon: '👥', title: 'Group Chat', desc: 'Buat grup diskusi dengan banyak anggota sekaligus' },
-  { icon: '📞', title: 'Voice Call', desc: 'Panggilan suara jernih dan berkualitas tinggi' },
+  { 
+    icon: '💬', 
+    title: 'Private Chat', 
+    desc: 'Chat pribadi real-time yang aman banget. Mau gibah atau nanya tugas jadi tenang, gak bakal nyasar ke grup keluarga apalagi tetangga sebelah.' 
+  },
+  { 
+    icon: '👥', 
+    title: 'Group Chat', 
+    desc: 'Wadah buat kumpulin circle kamu. Tempat paling pas buat para silent reader, tukang nyimak, atau orang-orang yang hobinya cuma nge-read doang.' 
+  },
+  { 
+    icon: '📞', 
+    title: 'Voice Call', 
+    desc: 'Panggilan suara seadanya. Kualitasnya sangat bergantung pada mood provider internet dan amal ibadah masing-masing.'
+  },
+  { 
+    icon: '✨', 
+    title: 'Sticker (Coming Soon)', 
+    desc: 'Sabar ya, fitur stiker masih dalam tahap pemikiran mendalam. Untuk sekarang, silakan pakai emoji bawaan HP atau kata-kata puitis dulu.' 
+  },
+  { 
+    icon: '🚀', 
+    title: 'File Sharing', 
+    desc: 'Kirim dokumen atau foto tanpa drama. Meskipun aplikasinya masih minimalis, tapi semangat kami buat ngalahin raksasa teknologi tetap ada (tapi bohong).' 
+  },
+  { 
+    icon: '🧘‍♂️', 
+    title: 'Bukan Fitur: Salam Bang Der', 
+    desc: 'Gak butuh pujian apalagi dikasihanin, Bang Der cuma butuh ketenangan batin. Aplikasi ini rakitan tangan sendiri, jadi tolong dipake ya biar begadangku ada gunanya sedikit.' 
+  }
 ];
 
 export default function LobbyPage() {
@@ -65,8 +92,7 @@ export default function LobbyPage() {
         </h1>
 
         <p className="hero-sub" style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 520, margin: '0 auto 40px', lineHeight: 1.7 }}>
-          Aplikasi chat modern dengan fitur lengkap — private chat, group chat, dan voice call. Gratis selamanya.
-        </p>
+          Aplikasi chat Bang Der dengan fitur — private chat, group chat, dan voice call.        </p>
 
         <div className="hero-cta" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 15, fontWeight: 700, padding: '13px 28px', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block', boxShadow: 'var(--shadow-glow)' }}>
@@ -82,7 +108,7 @@ export default function LobbyPage() {
       <section className="feat-cards" style={{ position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '0 24px 96px' }}>
         {/* Section label */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 10 }}>Fitur Unggulan</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 10 }}>Fitur</div>
           <div style={{ width: 40, height: 2, background: 'var(--accent)', margin: '0 auto', borderRadius: 2 }} />
         </div>
 

@@ -47,7 +47,7 @@ export default function RegisterPage() {
 
   const fields = [
     { name: 'username', label: 'Username', type: 'text', placeholder: 'username kamu' },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'kamu@email.com' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'bangder@email.com' },
     { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
     { name: 'confirmPassword', label: 'Konfirmasi Password', type: 'password', placeholder: '••••••••' },
   ];
