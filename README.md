@@ -1,20 +1,20 @@
 # COSMED Chat App
 
 Web pribadi berbasis **Next.js** yang terintegrasi dengan **MongoDB** sebagai database.
-Project ini dipisahkan menjadi dua folder utama:
+
+Project ini terdiri dari dua folder utama:
 
 ```
-C:\Users\daryd\ITSME\Programming\COSMED\
-│
-├── chat-app      → Aplikasi Next.js (Frontend + API Routes)
-└── MongoDB       → Konfigurasi Docker untuk MongoDB
+COSMED/
+ ├── chat-app   → Aplikasi Next.js (Frontend + API Routes)
+ └── mongodb    → Konfigurasi Docker untuk MongoDB
 ```
 
 MongoDB dijalankan menggunakan **Docker Compose**, sedangkan Next.js dijalankan menggunakan **npm**.
 
 ---
 
-## 📦 Tech Stack
+# 📦 Tech Stack
 
 * Next.js
 * TypeScript
@@ -30,35 +30,36 @@ MongoDB dijalankan menggunakan **Docker Compose**, sedangkan Next.js dijalankan 
 
 # 🚀 Cara Menjalankan Project
 
-## 1️⃣ Clone / Siapkan Folder
+## 1️⃣ Clone Repository
 
-Pastikan struktur folder seperti berikut:
-
+```bash
+git clone <repository-url>
+cd COSMED
 ```
-COSMED/
- ├── chat-app
- └── MongoDB
+
+Atau jika sudah punya foldernya, cukup masuk ke directory project:
+
+```bash
+cd nama-folder-project
 ```
 
 ---
 
 # 🐳 Menjalankan MongoDB (Docker)
 
-Masuk ke folder MongoDB:
+Masuk ke folder mongodb:
 
 ```bash
-cd C:\Users\daryd\ITSME\Programming\COSMED\MongoDB
+cd mongodb
 ```
 
-Pastikan sudah terdapat file `docker-compose.yml`.
-
-Lalu jalankan:
+Pastikan terdapat file `docker-compose.yml`, lalu jalankan:
 
 ```bash
 docker-compose up -d
 ```
 
-Untuk mengecek container berjalan:
+Cek apakah container sudah berjalan:
 
 ```bash
 docker ps
@@ -77,27 +78,25 @@ docker-compose down
 Masuk ke folder chat-app:
 
 ```bash
-cd C:\Users\daryd\ITSME\Programming\COSMED\chat-app
+cd ../chat-app
 ```
 
 ## Install Dependencies
 
-### Install Type Definitions & Tailwind
+Jika pertama kali menjalankan project:
+
+```bash
+npm install
+```
+
+Jika perlu install manual dependency tambahan:
 
 ```bash
 npm install --save-dev @types/bcryptjs @types/jsonwebtoken @types/js-cookie @types/node @types/react @types/react-dom typescript tailwindcss @tailwindcss/postcss
 ```
 
-### Install UUID
-
 ```bash
 npm install uuid
-```
-
-Atau jika belum pernah install dependency sama sekali:
-
-```bash
-npm install
 ```
 
 ---
@@ -118,34 +117,23 @@ http://localhost:3000
 
 # ⚙️ Environment Configuration
 
-Pastikan file `.env.local` di dalam folder `chat-app` sudah dikonfigurasi, contoh:
+Buat file `.env.local` di dalam folder `chat-app`, lalu isi:
 
 ```
 MONGODB_URI=mongodb://localhost:27017/nama_database
 JWT_SECRET=your_secret_key
 ```
 
-Sesuaikan dengan konfigurasi yang ada di docker-compose.
+Sesuaikan `nama_database` dengan konfigurasi di `docker-compose.yml`.
 
 ---
 
 # 📌 Catatan Penting
 
-* Pastikan Docker sudah berjalan sebelum menjalankan MongoDB.
-* Pastikan MongoDB container aktif sebelum menjalankan Next.js.
-* Jika terjadi error koneksi database, cek kembali:
+* Pastikan Docker sudah aktif sebelum menjalankan MongoDB.
+* Pastikan MongoDB container berjalan sebelum menjalankan Next.js.
+* Jika terjadi error koneksi database:
 
-  * Port MongoDB
-  * MONGODB_URI
-  * Status container Docker
-
----
-
-# 🛠 Development Mode
-
-Untuk development:
-
-* MongoDB → Docker Compose
-* Next.js → `npm run dev`
-
-Project ini masih berjalan dalam mode development.
+  * Cek status container (`docker ps`)
+  * Cek port MongoDB
+  * Cek `MONGODB_URI`
