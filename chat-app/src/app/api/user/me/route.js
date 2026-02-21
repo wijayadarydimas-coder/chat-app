@@ -6,6 +6,8 @@ import jwt              from 'jsonwebtoken';
 import connectDB        from '@/lib/db';
 import User             from '@/models/User';
 
+export const runtime = 'nodejs';
+
 async function getUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;

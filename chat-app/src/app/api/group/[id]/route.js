@@ -6,6 +6,8 @@ import connectDB from '@/lib/db';
 import Group from '@/models/Group';
 import GroupMessage from '@/models/GroupMessage';
 
+export const runtime = 'nodejs';
+
 async function getUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;

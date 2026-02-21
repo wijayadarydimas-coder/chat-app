@@ -3,6 +3,8 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function POST(request) {
   try {
     await dbConnect();

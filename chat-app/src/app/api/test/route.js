@@ -1,6 +1,8 @@
 // src/app/api/test/route.js - COPY PASTE
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function GET() {
   return NextResponse.json({ 
     message: '✅ API Test berhasil!',

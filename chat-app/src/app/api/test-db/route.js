@@ -2,6 +2,8 @@
 import dbConnect from '@/lib/db';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     console.log('🔄 Mencoba konek ke MongoDB...');

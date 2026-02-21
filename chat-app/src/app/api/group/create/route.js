@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/db';
 import Group from '@/models/Group';
 
+export const runtime = 'nodejs';
+
 async function getUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;

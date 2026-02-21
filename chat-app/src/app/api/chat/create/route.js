@@ -5,6 +5,8 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function POST(request) {
   try {
     const token = request.cookies.get('token')?.value;

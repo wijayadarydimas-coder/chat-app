@@ -1,39 +1,66 @@
+// src/models/Message.js — FIXED: tambah isVoice + voiceDuration
 import mongoose from 'mongoose';
 
 const MessageSchema = new mongoose.Schema({
   chatId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Chat',
-    required: [true, 'chatId is required']
+    index: true,
+  },
+  groupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+    index: true,
   },
   senderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'senderId is required']
+    required: true,
   },
   content: {
     type: String,
-    required: [true, 'content is required'],
-    trim: true
+    default: '',
   },
   fileUrl: {
     type: String,
-    default: null
+    default: null,
   },
   fileType: {
     type: String,
-    default: null
+    default: null,
   },
   fileName: {
     type: String,
-    default: null
+    default: null,
   },
+  fileSize: {
+    type: Number,
+    default: null,
+  },
+  // ── Voice note fields ──
+  isVoice: {
+    type: Boolean,
+    default: false,
+  },
+  voiceDuration: {
+    type: Number,
+    default: 0,
+  },
+  // ─────────────────────
   readBy: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }]
+    ref: 'User',
+  }],
+  read: {
+    type: Boolean,
+    default: false,
+  },
+  deletedFor: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
 export default mongoose.models.Message || mongoose.model('Message', MessageSchema);
