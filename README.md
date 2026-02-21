@@ -1,91 +1,151 @@
-```markdown
-# 🚀 Cosmed Chat App
+# COSMED Chat App
 
-Ini adalah proyek web pribadi (Chat App) yang dibangun menggunakan **Next.js**, **TypeScript**, dan **Tailwind CSS**. Data disimpan di **MongoDB** yang dijalankan melalui **Docker**.
+Web pribadi berbasis **Next.js** yang terintegrasi dengan **MongoDB** sebagai database.
+Project ini dipisahkan menjadi dua folder utama:
 
----
+```
+C:\Users\daryd\ITSME\Programming\COSMED\
+│
+├── chat-app      → Aplikasi Next.js (Frontend + API Routes)
+└── MongoDB       → Konfigurasi Docker untuk MongoDB
+```
 
-## 📂 Struktur Proyek
-
-Proyek ini terbagi menjadi dua folder utama:
-* `chat-app/` : Aplikasi Next.js (Frontend & API).
-* `MongoDB/` : Konfigurasi database menggunakan Docker Compose.
-
----
-
-## 🛠️ Prasyarat
-
-Sebelum menjalankan aplikasi, pastikan Anda sudah menginstall:
-* [Node.js](https://nodejs.org/) (Rekomendasi versi LTS)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* NPM (Sudah termasuk saat install Node.js)
+MongoDB dijalankan menggunakan **Docker Compose**, sedangkan Next.js dijalankan menggunakan **npm**.
 
 ---
 
-## 🚀 Cara Menjalankan Aplikasi
+## 📦 Tech Stack
 
-Ikuti urutan langkah di bawah ini:
+* Next.js
+* TypeScript
+* Tailwind CSS
+* MongoDB
+* Docker
+* bcryptjs
+* jsonwebtoken
+* js-cookie
+* uuid
 
-### 1. Menjalankan Database (Docker)
-Buka terminal, arahkan ke folder `MongoDB`, lalu jalankan container:
+---
+
+# 🚀 Cara Menjalankan Project
+
+## 1️⃣ Clone / Siapkan Folder
+
+Pastikan struktur folder seperti berikut:
+
+```
+COSMED/
+ ├── chat-app
+ └── MongoDB
+```
+
+---
+
+# 🐳 Menjalankan MongoDB (Docker)
+
+Masuk ke folder MongoDB:
+
 ```bash
-cd MongoDB
+cd C:\Users\daryd\ITSME\Programming\COSMED\MongoDB
+```
+
+Pastikan sudah terdapat file `docker-compose.yml`.
+
+Lalu jalankan:
+
+```bash
 docker-compose up -d
-
 ```
 
-*Database akan berjalan di `localhost:27017` secara default.*
-
-### 2. Instalasi Dependency (Next.js)
-
-Buka terminal baru, masuk ke folder `chat-app`, dan jalankan perintah berikut:
-
-**Instalasi Library Utama:**
+Untuk mengecek container berjalan:
 
 ```bash
-cd chat-app
-npm install uuid
-
+docker ps
 ```
 
-**Instalasi Development Tools (Typescript & Tailwind):**
+Untuk menghentikan MongoDB:
+
+```bash
+docker-compose down
+```
+
+---
+
+# 🌐 Menjalankan Next.js App
+
+Masuk ke folder chat-app:
+
+```bash
+cd C:\Users\daryd\ITSME\Programming\COSMED\chat-app
+```
+
+## Install Dependencies
+
+### Install Type Definitions & Tailwind
 
 ```bash
 npm install --save-dev @types/bcryptjs @types/jsonwebtoken @types/js-cookie @types/node @types/react @types/react-dom typescript tailwindcss @tailwindcss/postcss
-
 ```
 
-### 3. Menjalankan Server Development
+### Install UUID
 
-Di dalam folder `chat-app`, jalankan perintah berikut:
+```bash
+npm install uuid
+```
+
+Atau jika belum pernah install dependency sama sekali:
+
+```bash
+npm install
+```
+
+---
+
+## Jalankan Development Server
 
 ```bash
 npm run dev
-
 ```
 
-Buka browser dan akses: [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000)
+Aplikasi akan berjalan di:
+
+```
+http://localhost:3000
+```
 
 ---
 
-## 📦 Stack Teknologi
+# ⚙️ Environment Configuration
 
-| Komponen | Teknologi |
-| --- | --- |
-| **Framework** | Next.js (App Router) |
-| **Bahasa** | TypeScript |
-| **Styling** | Tailwind CSS |
-| **Database** | MongoDB |
-| **Container** | Docker |
-| **Auth** | JWT & BcryptJS |
+Pastikan file `.env.local` di dalam folder `chat-app` sudah dikonfigurasi, contoh:
 
----
+```
+MONGODB_URI=mongodb://localhost:27017/nama_database
+JWT_SECRET=your_secret_key
+```
 
-## 📝 Catatan Penting
-
-* Pastikan file `.env` sudah dikonfigurasi di dalam folder `chat-app` (misal: `MONGODB_URI`).
-* Jika ingin menghentikan database, gunakan command `docker-compose down` di dalam folder `MongoDB`.
+Sesuaikan dengan konfigurasi yang ada di docker-compose.
 
 ---
 
-**Dibuat oleh [ME]*
+# 📌 Catatan Penting
+
+* Pastikan Docker sudah berjalan sebelum menjalankan MongoDB.
+* Pastikan MongoDB container aktif sebelum menjalankan Next.js.
+* Jika terjadi error koneksi database, cek kembali:
+
+  * Port MongoDB
+  * MONGODB_URI
+  * Status container Docker
+
+---
+
+# 🛠 Development Mode
+
+Untuk development:
+
+* MongoDB → Docker Compose
+* Next.js → `npm run dev`
+
+Project ini masih berjalan dalam mode development.
