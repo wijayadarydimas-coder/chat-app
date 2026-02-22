@@ -886,53 +886,132 @@ function GroupCallOverlay({ groupId, groupName, callType, currentUser, socket, o
   const localRef = useRef(null);
   const peerConns = useRef({});
   const localStreamRef = useRef(null);
-  const STUN = { iceServers: [{ urls: process.env.NEXT_PUBLIC_STUN_SERVER || 'stun:stun.l.google.com:19302' }] };
+
+  // ── ICE config dengan TURN server ──
+  const ICE_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:80?transport=udp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turns:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+    ],
+    iceTransportPolicy: 'all',
+    iceCandidatePoolSize: 10,
+  };
 
   useEffect(() => {
     const init = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: callType === 'video',
+        });
         localStreamRef.current = stream;
         if (localRef.current) localRef.current.srcObject = stream;
-        socket.emit('group-call-join', { groupId, userId: currentUser._id, username: currentUser.username, callType });
-      } catch (e) { alert('Tidak bisa akses mikrofon/kamera: ' + e.message); onEnd(); }
+        socket.emit('group-call-join', {
+          groupId,
+          userId: currentUser._id,
+          username: currentUser.username,
+          callType,
+        });
+      } catch (e) {
+        alert('Tidak bisa akses mikrofon/kamera: ' + e.message);
+        onEnd();
+      }
     };
     init();
+
     socket.on('group-call-user-joined', async ({ socketId, username }) => {
       const pc = createPC(socketId, username);
-      const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
       socket.emit('group-call-offer', { targetId: socketId, offer, callType });
     });
+
     socket.on('group-call-offer', async ({ offer, from, fromUsername }) => {
       const pc = createPC(from, fromUsername);
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await pc.createAnswer(); await pc.setLocalDescription(answer);
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
       socket.emit('group-call-answer', { targetId: from, answer });
     });
-    socket.on('group-call-answer', async ({ answer, from }) => { await peerConns.current[from]?.setRemoteDescription(new RTCSessionDescription(answer)); });
-    socket.on('group-call-ice', ({ candidate, from }) => { peerConns.current[from]?.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {}); });
+
+    socket.on('group-call-answer', async ({ answer, from }) => {
+      await peerConns.current[from]?.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+
+    socket.on('group-call-ice', ({ candidate, from }) => {
+      peerConns.current[from]?.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+    });
+
     socket.on('group-call-user-left', ({ socketId }) => {
-      peerConns.current[socketId]?.close(); delete peerConns.current[socketId];
+      peerConns.current[socketId]?.close();
+      delete peerConns.current[socketId];
       setPeers(prev => { const n = { ...prev }; delete n[socketId]; return n; });
     });
-    return () => { ['group-call-user-joined','group-call-offer','group-call-answer','group-call-ice','group-call-user-left'].forEach(e => socket.off(e)); };
+
+    return () => {
+      ['group-call-user-joined', 'group-call-offer', 'group-call-answer',
+       'group-call-ice', 'group-call-user-left'].forEach(e => socket.off(e));
+    };
   }, []);
 
   const createPC = (socketId, username) => {
-    const pc = new RTCPeerConnection(STUN);
+    const pc = new RTCPeerConnection(ICE_CONFIG); // ← pakai ICE_CONFIG dengan TURN
     localStreamRef.current?.getTracks().forEach(t => pc.addTrack(t, localStreamRef.current));
     pc.ontrack = e => setPeers(prev => ({ ...prev, [socketId]: { stream: e.streams[0], username } }));
-    pc.onicecandidate = e => { if (e.candidate) socket.emit('group-call-ice', { targetId: socketId, candidate: e.candidate }); };
-    peerConns.current[socketId] = pc; return pc;
+    pc.onicecandidate = e => {
+      if (e.candidate) socket.emit('group-call-ice', { targetId: socketId, candidate: e.candidate });
+    };
+    pc.oniceconnectionstatechange = () => {
+      console.log(`ICE state [${socketId}]:`, pc.iceConnectionState);
+    };
+    peerConns.current[socketId] = pc;
+    return pc;
   };
 
   const handleEnd = () => {
     localStreamRef.current?.getTracks().forEach(t => t.stop());
-    Object.values(peerConns.current).forEach(pc => pc.close()); peerConns.current = {};
-    socket.emit('group-call-leave', { groupId }); onEnd();
+    Object.values(peerConns.current).forEach(pc => pc.close());
+    peerConns.current = {};
+    socket.emit('group-call-leave', { groupId });
+    onEnd();
   };
-  const toggleMute = () => { localStreamRef.current?.getAudioTracks().forEach(t => { t.enabled = !t.enabled; }); setMuted(m => !m); };
-  const toggleVideo = () => { localStreamRef.current?.getVideoTracks().forEach(t => { t.enabled = !t.enabled; }); setVideoOff(v => !v); };
+
+  const toggleMute = () => {
+    localStreamRef.current?.getAudioTracks().forEach(t => { t.enabled = !t.enabled; });
+    setMuted(m => !m);
+  };
+
+  const toggleVideo = () => {
+    localStreamRef.current?.getVideoTracks().forEach(t => { t.enabled = !t.enabled; });
+    setVideoOff(v => !v);
+  };
+
   const peerList = Object.entries(peers);
 
   return (
@@ -1308,36 +1387,96 @@ export default function ChatPage() {
   };
 
   // ── Calls ──
-  const STUN = { iceServers: [{ urls: process.env.NEXT_PUBLIC_STUN_SERVER || 'stun:stun.l.google.com:19302' }] };
+  const ICE_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:80?transport=udp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+      {
+        urls: 'turns:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject',
+      },
+    ],
+    iceTransportPolicy: 'all',
+    iceCandidatePoolSize: 10,
+  };
 
   const startPrivateCall = async (type = 'audio') => {
-    if (!selectedChat || selectedChat.type === 'group') return;
-    const tid = selectedChat.otherUser?._id; if (!tid) return;
-    const getSocket = () => new Promise(resolve => {
-      socket.emit('get-socket-id', { userId: tid });
-      const h = ({ userId, socketId }) => { if (userId === tid) { socket.off('socket-id-result', h); resolve(socketId); } };
-      socket.on('socket-id-result', h); setTimeout(() => { socket.off('socket-id-result', h); resolve(null); }, 3000);
+  if (!selectedChat || selectedChat.type === 'group') return;
+  const tid = selectedChat.otherUser?._id;
+  if (!tid) return;
+
+  const getTargetSocket = () => new Promise(resolve => {
+    socket.emit('get-socket-id', { userId: tid });
+    const h = ({ userId, socketId }) => {
+      if (userId === tid) { socket.off('socket-id-result', h); resolve(socketId); }
+    };
+    socket.on('socket-id-result', h);
+    setTimeout(() => { socket.off('socket-id-result', h); resolve(null); }, 3000);
+  });
+
+  try {
+    const sid = await getTargetSocket();
+    if (!sid) { alert('User sedang offline.'); return; }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: type === 'video',
     });
-    try {
-      const sid = await getSocket(); if (!sid) { alert('User sedang offline.'); return; }
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'video' });
-      setLocalStream(stream);
-      const pc = new RTCPeerConnection(STUN);
-      stream.getTracks().forEach(t => pc.addTrack(t, stream));
-      pc.ontrack = e => setRemoteStream(e.streams[0]);
-      pc.onicecandidate = e => { if (e.candidate) socket.emit('ice-candidate', { targetId: sid, candidate: e.candidate }); };
-      peerRef.current = pc;
-      const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
-      socket.emit('call-offer', { targetId: sid, offer, fromUserId: user._id, fromUsername: user.username, callType: type });
-      setPrivateCall({ type, status: 'calling', with: selectedChat.otherUser, socketId: sid });
-    } catch (e) { alert('Gagal memulai call: ' + e.message); }
+    setLocalStream(stream);
+
+    const pc = new RTCPeerConnection(ICE_CONFIG); // ← PENTING: pakai ICE_CONFIG
+    stream.getTracks().forEach(t => pc.addTrack(t, stream));
+    pc.ontrack = e => setRemoteStream(e.streams[0]);
+    pc.onicecandidate = e => {
+      if (e.candidate) socket.emit('ice-candidate', { targetId: sid, candidate: e.candidate });
+    };
+    pc.oniceconnectionstatechange = () => {
+      console.log('📡 ICE state (caller):', pc.iceConnectionState);
+    };
+    peerRef.current = pc;
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    socket.emit('call-offer', {
+      targetId: sid,
+      offer,
+      fromUserId: user._id,
+      fromUsername: user.username,
+      callType: type,
+    });
+    setPrivateCall({ type, status: 'calling', with: selectedChat.otherUser, socketId: sid });
+  } catch (e) {
+    alert('Gagal memulai call: ' + e.message);
+  }
   };
 
   const acceptCall = async (fromSocketId, offer, callType, sock) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' });
       setLocalStream(stream);
-      const pc = new RTCPeerConnection(STUN);
+      const pc = new RTCPeerConnection(ICE_CONFIG);
       stream.getTracks().forEach(t => pc.addTrack(t, stream));
       pc.ontrack = e => setRemoteStream(e.streams[0]);
       pc.onicecandidate = e => { if (e.candidate) (sock || socket)?.emit('ice-candidate', { targetId: fromSocketId, candidate: e.candidate }); };
