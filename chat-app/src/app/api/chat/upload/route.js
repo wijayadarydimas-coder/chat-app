@@ -21,11 +21,13 @@ export async function POST(request) {
     const fileType = file.type || '';
     const isImage = fileType.startsWith('image/');
     const isAudio = fileType.startsWith('audio/') || fileType.includes('audio');
+    const isVideo = fileType.startsWith('video/');
     const isPdf   = fileType === 'application/pdf';
     const isDoc   = fileType.includes('word') || fileType === 'text/plain';
 
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+      'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime',
       'application/pdf', 'text/plain',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -33,7 +35,7 @@ export async function POST(request) {
     ];
 
     const isAllowed = allowedTypes.some(t => fileType.startsWith(t.split(';')[0]))
-      || isImage || isAudio;
+      || isImage || isAudio || isVideo;
 
     if (!isAllowed) {
       return NextResponse.json({ error: `Tipe file tidak didukung: ${fileType}` }, { status: 400 });
@@ -41,8 +43,9 @@ export async function POST(request) {
 
     // Ukuran max
     let maxSize = 5 * 1024 * 1024; // 5MB default
-    if (isImage) maxSize = 10 * 1024 * 1024;   // 10MB
-    if (isAudio) maxSize = 25 * 1024 * 1024;   // 25MB
+    if (isImage) maxSize = 15 * 1024 * 1024;   // 15MB
+    if (isAudio) maxSize = 30 * 1024 * 1024;   // 30MB
+    if (isVideo) maxSize = 50 * 1024 * 1024;   // 50MB
 
     if (file.size > maxSize) {
       const maxMB = maxSize / (1024 * 1024);

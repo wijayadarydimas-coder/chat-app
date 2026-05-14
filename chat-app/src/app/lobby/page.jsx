@@ -8,7 +8,7 @@ const features = [
   { 
     icon: '💬', 
     title: 'Private Chat', 
-    desc: 'Chat pribadi real-time yang aman banget. Mau gibah atau nanya tugas jadi tenang, gak bakal nyasar ke grup keluarga apalagi tetangga sebelah.' 
+    desc: 'Chat pribadi real-time yang mudah digunakan. Hubungi teman atau keluarga dengan satu klik.' 
   },
   { 
     icon: '👥', 
@@ -39,7 +39,24 @@ const features = [
 
 export default function LobbyPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem('cosmed_theme') || 'dark';
+    setTheme(saved);
+    if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('cosmed_theme', newTheme);
+    if (newTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+  };
+
   if (!mounted) return null;
 
   return (
@@ -55,23 +72,34 @@ export default function LobbyPage() {
         .btn-ghost:hover   { background: var(--bg-elevated) !important; }
         .feat-card:hover   { border-color: var(--border-accent) !important; transform: translateY(-3px); }
         .nav-link:hover    { color: var(--text-primary) !important; }
+        .theme-toggle-lobby {
+          display: flex; align-items: center; justify-content: center;
+          width: 38px; height: 38px; border-radius: 12px;
+          background: var(--bg-surface); border: 1px solid var(--border);
+          color: var(--text-primary); cursor: pointer; transition: all 0.2s;
+        }
+        .theme-toggle-lobby:hover { border-color: var(--accent); background: var(--bg-elevated); transform: scale(1.05); }
       `}</style>
 
       {/* Ambient glow */}
       <div style={{ position: 'fixed', top: -200, left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, background: 'radial-gradient(ellipse, rgba(0,229,195,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0, animation: 'pulse 6s ease infinite' }} />
 
       {/* ── NAVBAR ── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(10,12,16,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'var(--bg-surface)', opacity: 0.95, backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>💬</div>
-            <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>ChatApp</span>
+            <img src="/Logo.png" alt="Cosmed Logo" style={{ width: 38, height: 38, objectFit: 'contain' }} onError={(e) => e.target.style.display = 'none'} />
+            <span style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '0.05em' }}>COSMED</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button className="theme-toggle-lobby" onClick={toggleTheme} title="Ganti Tema">
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
+            <div style={{ width: 1, height: 24, background: 'var(--border)', margin: '0 4px' }} />
             <Link href="/login" className="nav-link" style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, padding: '7px 14px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', transition: 'color 0.15s' }}>
               Login
             </Link>
-            <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 14, fontWeight: 700, padding: '8px 18px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block' }}>
+            <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 14, fontWeight: 700, padding: '10px 20px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block' }}>
               Daftar Gratis
             </Link>
           </div>
@@ -83,7 +111,7 @@ export default function LobbyPage() {
         {/* Badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', borderRadius: 100, padding: '5px 14px', marginBottom: 28, fontSize: 12, fontWeight: 600, color: 'var(--accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', boxShadow: '0 0 6px var(--accent)' }} />
-          Realtime • Gratis • Aman
+          Realtime • Gratis • Cepat
         </div>
 
         <h1 className="hero-title" style={{ fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
@@ -92,7 +120,8 @@ export default function LobbyPage() {
         </h1>
 
         <p className="hero-sub" style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 520, margin: '0 auto 40px', lineHeight: 1.7 }}>
-          Aplikasi chat Bang Der dengan fitur — private chat, group chat, dan voice call.        </p>
+          Aplikasi chat modern dengan fitur — private chat, group chat, dan voice call berkualitas tinggi.
+        </p>
 
         <div className="hero-cta" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/register" className="btn-primary" style={{ background: 'var(--accent)', color: '#0a0c10', fontSize: 15, fontWeight: 700, padding: '13px 28px', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: 'all 0.2s', display: 'inline-block', boxShadow: 'var(--shadow-glow)' }}>
@@ -127,7 +156,7 @@ export default function LobbyPage() {
 
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '24px', textAlign: 'center' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>© {new Date().getFullYear()} ChatApp — dibuat dengan 💚</span>
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>© {new Date().getFullYear()} COSMED — Dibuat dengan 💚 oleh Tim Kami</span>
       </footer>
     </div>
   );

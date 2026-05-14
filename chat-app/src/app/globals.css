@@ -2,6 +2,30 @@
 @import "tailwindcss";
 
 :root {
+  /* LIGHT MODE (Default) */
+  --bg-base: #f3f5f9;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8fafc;
+  --bg-hover: #f1f5f9;
+  --accent: #00bfa5;
+  --accent-muted: rgba(0, 191, 165, 0.1);
+  --accent-glow: rgba(0, 191, 165, 0.2);
+  --text-primary: #1a1c1e;
+  --text-muted: #65676b;
+  --text-subtle: #8e9196;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(0, 191, 165, 0.2);
+  --danger: #e53935;
+  --danger-muted: rgba(229, 57, 53, 0.1);
+  --bubble-me: #00bfa5;
+  --bubble-them: #e4e6eb;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-glow: 0 4px 12px rgba(0, 191, 165, 0.15);
+}
+
+[data-theme='dark'] {
   --bg-base: #0a0c10;
   --bg-surface: #111318;
   --bg-elevated: #1a1d26;
@@ -18,11 +42,9 @@
   --danger-muted: rgba(255, 77, 109, 0.12);
   --bubble-me: #00c4a8;
   --bubble-them: #1e2130;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
   --shadow-glow: 0 0 20px rgba(0, 229, 195, 0.15);
 }
+
 
 *,
 *::before,

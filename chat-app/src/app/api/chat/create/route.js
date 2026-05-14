@@ -24,7 +24,7 @@ export async function POST(request) {
     await dbConnect();
 
     // Validasi target user exists
-    const targetUser = await User.findById(targetUserId).select('username avatar status');
+    const targetUser = await User.findById(targetUserId).select('username avatar bio showOnlineStatus');
     if (!targetUser) {
       return NextResponse.json({ error: 'Target user not found' }, { status: 404 });
     }
@@ -35,7 +35,7 @@ export async function POST(request) {
         $all: [decoded.id, targetUserId],
         $size: 2
       }
-    }).populate('members', 'username avatar status');
+    }).populate('members', 'username avatar bio showOnlineStatus');
 
     if (!chat) {
       // Buat chat baru
@@ -45,7 +45,7 @@ export async function POST(request) {
       
       // Populate members setelah create
       chat = await Chat.findById(chat._id)
-        .populate('members', 'username avatar status');
+        .populate('members', 'username avatar bio showOnlineStatus');
     }
 
     // Format response dengan otherUser yang lengkap
@@ -57,7 +57,7 @@ export async function POST(request) {
     );
 
     // Dapatkan data current user
-    const currentUser = await User.findById(decoded.id).select('username avatar status');
+    const currentUser = await User.findById(decoded.id).select('username avatar bio showOnlineStatus');
 
     return NextResponse.json({ 
       chat: {

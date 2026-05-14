@@ -46,6 +46,11 @@ const MessageSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  // ── Sticker field ──
+  isSticker: {
+    type: Boolean,
+    default: false,
+  },
   // ─────────────────────
   readBy: [{
     type: mongoose.Schema.Types.ObjectId,

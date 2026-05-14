@@ -19,9 +19,13 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     default: '/default-avatar.png' 
   },
-  status: { 
+  bio: { 
     type: String, 
-    default: 'offline' 
+    default: 'Hey there! I am using COSMED.' 
+  },
+  showOnlineStatus: { 
+    type: Boolean, 
+    default: true 
   },
   createdAt: { 
     type: Date, 

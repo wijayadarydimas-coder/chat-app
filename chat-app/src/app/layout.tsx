@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chatapp",
-  description: "Chatapp Bang Der",
+  title: "COSMED",
+  description: "Aplikasi Chat Modern & Real-time",
 };
 
 export default function RootLayout({

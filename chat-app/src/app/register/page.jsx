@@ -1,7 +1,7 @@
 'use client';
 // chat-app\src\app\register\page.jsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -11,6 +11,22 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState('');
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('cosmed_theme') || 'dark';
+    setTheme(saved);
+    if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('cosmed_theme', newTheme);
+    if (newTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+  };
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -57,17 +73,39 @@ export default function RegisterPage() {
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .theme-toggle { 
+          position: fixed; top: 24px; right: 24px; 
+          background: var(--bg-surface); border: 1px solid var(--border); 
+          color: var(--text-primary); border-radius: 12px; width: 44px; height: 44px; 
+          display: flex; alignItems: center; justifyContent: center; cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); zIndex: 100;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          font-size: 20px;
+        }
+        .theme-toggle:hover { 
+          background: var(--bg-elevated); 
+          border-color: var(--accent); 
+          transform: rotate(15deg) scale(1.1);
+          box-shadow: 0 0 15px var(--accent-glow);
+        }
         .auth-card { animation: fadeUp 0.3s ease; }
         ::placeholder { color: var(--text-muted); }
       `}</style>
 
+      <button className="theme-toggle" onClick={toggleTheme} title="Ganti Tema">
+        {theme === 'dark' ? '🌙' : '☀️'}
+      </button>
+
       <div className="auth-card" style={{ width: '100%', maxWidth: 420 }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', marginBottom: 16, boxShadow: 'var(--shadow-glow)' }}>
-            <span style={{ fontSize: 24 }}>💬</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: 'transparent', marginBottom: 16 }}>
+            <img src="/Logo.png" alt="Cosmed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => e.target.style.display = 'none'} />
+            <div style={{ position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-muted)', border: '1px solid var(--border-accent)', zIndex: -1 }}>
+              <span style={{ fontSize: 24 }}>💬</span>
+            </div>
           </div>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 8 }}>ChatApp</div>
+          <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.15em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 8 }}>COSMED</div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Buat Akun Baru</h1>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
             Sudah punya akun?{' '}

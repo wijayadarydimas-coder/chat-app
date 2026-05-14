@@ -5,7 +5,7 @@ const next             = require('next');
 const { Server }       = require('socket.io');
 
 const dev      = process.env.NODE_ENV !== 'production';
-const hostname = '0.0.0.0';
+const hostname = 'localhost';
 const port     = process.env.PORT || 3000;
 const app      = next({ dev, hostname, port });
 const handle   = app.getRequestHandler();
@@ -138,27 +138,57 @@ app.prepare().then(() => {
 
     // ─── PRIVATE CALL ──────────────────────────────────────
     socket.on('call-offer', (data) => {
-      if (!data?.targetId) return;
-      socket.to(data.targetId).emit('call-offer', {
-        offer: data.offer, from: socket.id,
-        fromUserId: data.fromUserId, fromUsername: data.fromUsername,
-        callType: data.callType || 'audio',
-      });
+      const targetUserId = data.targetUserId;
+      const targetSocketId = data.targetId;
+      console.log(`📡 Call Offer from ${socket.id} (${data.fromUsername}) to User: ${targetUserId || 'N/A'}, Socket: ${targetSocketId || 'N/A'}`);
+      
+      const sendOffer = (sid) => {
+        console.log(`   >> Forwarding offer to socket: ${sid}`);
+        socket.to(sid).emit('call-offer', {
+          offer: data.offer, 
+          fromSocketId: socket.id,
+          fromUserId: data.fromUserId, 
+          fromUsername: data.fromUsername,
+          callType: data.callType || 'audio',
+        });
+      };
+
+      if (targetUserId) {
+        const sockets = userSockets.get(targetUserId);
+        if (sockets && sockets.size > 0) {
+          console.log(`   >> Found ${sockets.size} active sockets for user ${targetUserId}`);
+          sockets.forEach(sid => sendOffer(sid));
+        } else {
+          console.log(`   ⚠️ No active sockets found for user ${targetUserId}`);
+        }
+      } else if (targetSocketId) {
+        sendOffer(targetSocketId);
+      }
     });
 
     socket.on('call-answer', (data) => {
+      console.log(`📡 Call Answer from ${socket.id} to ${data.targetId}`);
       if (!data?.targetId) return;
-      socket.to(data.targetId).emit('call-answer', { answer: data.answer, from: socket.id });
+      socket.to(data.targetId).emit('call-answer', { 
+        answer: data.answer, 
+        fromSocketId: socket.id 
+      });
     });
 
     socket.on('ice-candidate', (data) => {
+      console.log(`📡 ICE Candidate from ${socket.id} to ${data.targetId}`);
       if (!data?.targetId) return;
-      socket.to(data.targetId).emit('ice-candidate', data.candidate);
+      socket.to(data.targetId).emit('ice-candidate', { 
+        candidate: data.candidate,
+        fromSocketId: socket.id
+      });
     });
 
     socket.on('call-end', (data) => {
       if (!data?.targetId) return;
-      socket.to(data.targetId).emit('call-ended', { from: socket.id });
+      socket.to(data.targetId).emit('call-ended', { 
+        fromSocketId: socket.id 
+      });
     });
 
     // ─── GROUP CALL ────────────────────────────────────────
@@ -234,7 +264,7 @@ app.prepare().then(() => {
   }, 30000);
 
   server.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Server ready → http://0.0.0.0:${port}`);
+    console.log(`🚀 Server ready → http://${hostname}:${port}`);
     console.log(`🌍 Mode: ${dev ? 'development' : 'production'}`);
   });
 });

@@ -21,7 +21,7 @@ export async function GET(request) {
     const chats = await Chat.find({
       members: decoded.id
     })
-    .populate('members', 'username avatar status')
+    .populate('members', 'username avatar bio showOnlineStatus')
     .populate({
       path: 'lastMessage',
       populate: {
@@ -47,7 +47,7 @@ export async function GET(request) {
         );
         
         if (otherUserId) {
-          const userData = await User.findById(otherUserId).select('username avatar status');
+          const userData = await User.findById(otherUserId).select('username avatar bio showOnlineStatus');
           return {
             ...chatObj,
             otherUser: userData || { 
